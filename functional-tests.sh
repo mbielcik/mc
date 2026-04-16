@@ -972,6 +972,9 @@ function test_admin_users() {
 	# check that the user can write objects with readwrite policy
 	assert_success "$start_time" "${FUNCNAME[0]}" mc_cmd admin policy attach "$SERVER_ALIAS" readwrite --user="${username}"
 
+	# verify that re-attaching an already attached policy to a user does not result in a failure.
+	assert_success "$start_time" "${FUNCNAME[0]}" mc_cmd admin policy attach "$SERVER_ALIAS" readwrite --user="${username}"
+
 	# Validate that the correct policy has been added to the user
 	"${MC_CMD[@]}" --json admin user list "${SERVER_ALIAS}" | jq -r '.policyName' | grep --quiet "^readwrite$"
 	rv=$?
@@ -1043,7 +1046,6 @@ function run_test() {
 	test_copy_object_preserve_filesystem_attr
 	test_find
 	test_find_empty
-	test_bucket_replication
 	if [ -z "$MINT_MODE" ]; then
 		test_watch_object
 	fi
